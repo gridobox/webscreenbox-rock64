@@ -1,0 +1,14 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+
+# check if overlayroot is enabled
+
+# disable swap and tmp
+
+  - name: overlayroot on
+    lineinfile:
+      path: /etc/overlayroot.conf
+      regexp: '^#?overlayroot='
+      line: 'overlayroot="tmpfs"'

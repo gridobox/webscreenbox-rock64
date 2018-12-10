@@ -1,0 +1,28 @@
+---
+- hosts: board
+  gather_facts: false
+  vars:
+
+  tasks:
+
+  - name: Clear system log files
+    shell: echo "" > {{ item }}
+    with_items:
+    - /var/log/syslog
+    - /var/log/kern.log
+    - /var/log/auth.log
+
+  - name: Clear Chromium browser cache and profile
+    shell: rm -rf /home/{{ operator_user }}/{{ browser_cache_path }} /home/{{ operator_user }}/{{ browser_profile_path }}
+
+  - name: Scatter root comand history
+    shell: echo "tmux attach" > /root/.bash_history
+
+  - name: Scatter {{ admin_user }} comand history
+    shell: echo "sudo su -" > /home/{{ admin_user }}/.bash_history
+
+  - name: Scatter {{ operator_user }} comand history
+    shell: echo "webscreen-admin" > /home/{{ operator_user }}/.bash_history
+
+  - name: Delte all connections from NetworkManager
+    shell: rm -rf /etc/NetworkManager/system-connections/*

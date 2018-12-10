@@ -1,0 +1,79 @@
+---
+- hosts: board
+  gather_facts: false
+  vars:
+    prompt_color_dict: {
+      "none": "00",
+      "Default foreground color": "39",
+      "Black": "30",
+      "Red": "31",
+      "Green": "32",
+      "Yellow": "33",
+      "Blue": "34",
+      "Magenta": "35",
+      "Cyan": "36",
+      "Light gray": "37",
+      "Dark gray": "90",
+      "Light red": "91",
+      "Light green": "92",
+      "Light yellow": "93",
+      "Light blue": "94",
+      "Light magenta": "95",
+      "Light cyan": "96",
+      "White": "97"
+    }
+  tasks:
+
+  - name: Colorful terminal prompt
+    lineinfile:
+      path: "{{ admin_user_home }}/.bashrc"
+      regexp: '^export PS1='
+      line: "export PS1='\\[\\033[01;{{ prompt_color_dict[prompt_color] }}m\\]\\u@\\h \\[\\033[01;34m\\]\\W\\[\\033[01;{{ prompt_color_dict[prompt_color] }}m\\]\\[\\033[00m\\]\\$ '"
+
+  - name: Make mcedit default editor
+    lineinfile:
+      path: "{{ admin_user_home }}/.bashrc"
+      line: "export EDITOR=mcedit"
+
+  # TODO improve tmux defaults - update log files
+  - name: Update default tmux settings
+    copy:
+      dest: "{{ admin_user_home }}/.tmux.conf"
+      content: |
+        set -g mouse on
+        set -g history-limit 30000
+        set -g base-index 1
+
+        ################  WINDOW 1  ##################
+
+        new -s "WebScreenBox" -n "chroot" "echo 'This is chrooted terminal, it is safe to modify sdcard here.' && overlayroot-chroot ; bash"
+
+        ################  WINDOW 2  ##################
+
+        neww  -n "monitoring" "htop ; bash"
+
+        # split horizontally 60%, change directory to /tmp -> print content -> show some arbitrary help text -> show prompt
+        #splitw -h -p 60 -t 0 "cd /tmp && bash -c 'echo -e \"some helptext\"' ; bash"
+        splitw -h -p 50 -t 0 "iftop -PNn -f 'not port ssh' ; bash"
+
+        # split vertically 80% and start top, when closed jump to terminal
+        #splitw -v -p 20 -t 0 'grep -E "(UMP|ntp.*offset)" /var/log/syslog  ; bash'
+        splitw -v -p 20 -t 1 "watch df -h ; bash"
+
+
+        ################  WINDOW 3  ##################
+
+        neww -n "logs" "tailf -n 50 /var/log/webscreenbox/utils.log ; bash"
+        splitw -h -p 50 -t 0 "tailf -n 50 /var/log/webscreenbox/content.log ; bash"
+
+        ################  WINDOW 4  ##################
+
+        neww -n "reboot" "echo 'This is pure terminal, it is safe to run reboot here.' ; bash"
+
+
+
+        # switch to window 1
+        next
+      mode: 0644
+      owner: "{{ admin_user }}"
+      group: "{{ admin_user }}"

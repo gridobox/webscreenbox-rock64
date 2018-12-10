@@ -1,0 +1,46 @@
+[all:vars]
+# bash color
+prompt_color="Light red"
+
+
+# URL
+simple_url="http://github.com"
+
+
+hostname="webscreenbox001"
+
+admin_user=rock64
+admin_user_home=/home/rock64
+
+# browser="firefox"
+browser="chromium-browser"
+
+# relative to operator user home dir, no trailing slash
+browser_cache_path=".cache/chromium"
+# for Chromium cleanup
+browser_profile_path=".config/chromium"
+
+zabbix_server=192.168.1.1
+
+x11vnc_passwd=mypassword
+
+# operator specific
+operator_user=operator
+# generate following line with `mkpasswd --method=sha-512`
+operator_passwd=xxx
+
+webscreen_name="Web Screen Box"
+webscreen_ascii_logo="WebScreenBox"
+webscreen_ascii_logo_style="metal"
+
+
+[localhost]
+127.0.0.1
+
+#### SET YOUR HOST HERE ####
+[board:children]
+192.168.1.10
+
+[board:vars]
+ansible_user="{{ admin_user }}"
+ansible_become=true

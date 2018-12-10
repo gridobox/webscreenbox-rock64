@@ -1,0 +1,66 @@
+---
+- hosts: board
+  gather_facts: false
+  vars:
+
+  tasks:
+
+  - name: Install software
+    apt: name={{ item }} state=present
+    with_items:
+    - overlayroot
+    - unclutter   # TODO experiment with https://github.com/Airblader/unclutter-xfixes
+    - xinit
+    - xdotool
+    - x11vnc
+    - xtrlock
+    - imagemagick
+
+  - name: Check x11vnc conf dir exists
+    file:
+      dest: /etc/x11vnc
+      state: directory
+
+  - name: VNC password
+    shell: x11vnc -storepasswd "{{ x11vnc_passwd }}" /etc/x11vnc/vncpwd
+
+  - name: Check x11vnc/vncpwd belongs to the {{ operator_user }}
+    file:
+      dest: /etc/x11vnc/vncpwd
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+  - name: Check webscreenbox dir exists
+    file:
+      dest: /opt/webscreenbox
+      state: directory
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+  - name: Check webscreenbox screenshots dir exists
+    file:
+      dest: /opt/webscreenbox/screenshots/
+      state: directory
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+  - name: Check webscreenbox log dir exists
+    file:
+      dest: /opt/webscreenbox/log/
+      state: directory
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+  - name: Logrotate for WebScreenBox logs
+    copy:
+      dest: /etc/logrotate.d/webscreenbox-logs
+      content: |
+        /opt/webscreenbox/log/*.log
+        {
+          rotate 6
+          daily
+          compress
+          missingok
+          notifempty
+        }
+      mode: 0755

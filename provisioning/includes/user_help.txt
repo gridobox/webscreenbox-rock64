@@ -1,0 +1,19 @@
+This system is read-only by default, before making any changes, make sure you
+switch to the read/write mode by `enable-writable` command.
+
+After you are done with your changes, switch to read-only mode and reboot.
+
+Management commands:
+
+  enable-writable       Switch to read/write mode
+  disable-writable      Switch to read-only mode
+  reboot                Reboot machine
+
+Configuration commands:
+
+  edit-url              Edit URL displayed on startup
+  edit-hostname         Edit system hostname
+  reset-browser         Clears cache and deletes profile. Needed after hostname change
+  configure-network     NetworkManager interactive setup (e.g. for adding WiFi)
+
+Default file editor is `mcedit` (F2 save, F10 exit).

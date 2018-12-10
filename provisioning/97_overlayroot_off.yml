@@ -1,0 +1,15 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+
+# TODO
+# check if overlayroot is enabled
+
+# switch to overlayroot-chroot
+
+  - name: overlayroot off
+    lineinfile:
+      path: /etc/overlayroot.conf
+      regexp: '^overlayroot='
+      line: '#overlayroot="tmpfs"'

@@ -1,0 +1,85 @@
+# # TODO investigate - there seem to be default unclutter in lxsession
+#   641 ?        Ss     0:00 /usr/sbin/lxdm-binary
+#   648 tty7     Ssl+  35:13  \_ /usr/lib/xorg/Xorg :0 vt07 -nolisten tcp -novtswitch -auth /var/run/lxdm/lxdm-:0.auth
+#   681 ?        S      0:00  \_ /usr/lib/lxdm/lxdm-session
+#   694 ?        Ssl    0:00      \_ /usr/bin/lxsession -s LXDE -e LXDE
+#   726 ?        S      0:11          \_ /usr/bin/unclutter -idle 1 -root
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+  - name: Update simple_url.txt file
+    copy:
+      content: |
+        {{ simple_url }}
+
+        # First line of this file must contain valid URL to load on startup
+        # examples:
+        about:blank
+        https://time.is
+        https://flightradar24.com
+      dest: /opt/webscreenbox/simple_url.txt
+      mode: 0666
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+  - name: Update autostart_utils.sh file
+    copy:
+      dest: /opt/webscreenbox/autostart_utils.sh
+      content: |
+        #!/bin/bash
+
+        # redirect all output to a logfile
+        exec >> /opt/webscreenbox/log/utils.log
+        exec 2>&1
+
+        # disable screen saver
+        xset -dpms
+        xset s off
+        xset s noblank
+
+        # lock physical access
+        xtrlock &
+
+        # move mouse away, not to trigger hover effects
+        xdotool mousemove 0 0
+
+        # hide cursor - buggy makes zombie process when lxdm is restarted
+        #unclutter -idle 5 &
+
+      mode: 0755
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+
+  - name: Update autostart_content.sh file
+    copy:
+      dest: /opt/webscreenbox/autostart_content.sh
+      content: |
+        #!/bin/bash
+
+        # redirect all output to a logfile
+        exec >> /opt/webscreenbox/log/content.log
+        exec 2>&1
+
+        URL=$(head -n 1 /opt/webscreenbox/simple_url.txt)
+        # URL="about:blank"
+
+        # chromium
+        #{% if not browser == 'chromium-browser' %}# {% endif %}sed -i -E 's/"exited_cleanly": ?false/"exited_cleanly":true/' ~/{{ browser_profile_path }}/Default/Preferences
+        #{% if not browser == 'chromium-browser' %}# {% endif %}sed -i -E 's/"exit_type": ?"Crashed"/"exit_type":"Normal"/' ~/{{ browser_profile_path }}/Default/Preferences
+        #{% if not browser == 'chromium-browser' %}# {% endif %}chromium-browser --start-fullscreen --no-first-run --touch-events=enabled --fast --fast-start --disable-popup-blocking --disable-infobars --disable-session-crashed-bubble --disable-tab-switcher --disable-translate --enable-low-res-tiling "${URL}"
+        {% if not browser == 'chromium-browser' %}# {% endif %}chromium-browser --incognito --start-fullscreen  --fast --fast-start --disable-popup-blocking --disable-infobars --disable-session-crashed-bubble --disable-tab-switcher --disable-translate --enable-low-res-tiling "${URL}"
+
+        # firefox
+        {% if not browser == 'firefox' %}# {% endif %}firefox -private -url "${URL}"
+
+        # midori - not available by default in Ubuntu Bionic
+        {% if not browser == 'midori' %}# {% endif %}midori -e Fullscreen -i 100 -a "${URL}"
+
+        # script
+        {% if not browser == 'scripted' %}# {% endif %}. /opt/webscreenbox/scripted_browser.sh
+
+      mode: 0755
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"

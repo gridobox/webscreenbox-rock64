@@ -1,0 +1,67 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+  - name: Set hostname
+    hostname:
+      name: '{{ hostname }}'
+
+# TODO review
+#   - name: Disable unattended updates in apt config
+#     lineinfile:
+#       path: /etc/apt/apt.conf.d/02-armbian-periodic
+# #      path: /etc/apt/apt.conf.d/02periodic
+#       regexp: '^#? ?APT::Periodic::Enable "[01]";'
+#       line: 'APT::Periodic::Enable "0";'
+#
+# # not needed any more as NetworkManager is used instead of old wpa_supplicant
+# #    # disable predicable network interface names on usb net devices - to be able to use wlan0 in config
+# #    # this will override default /lib/udev/rules.d/73-usb-net-by-mac.rules
+# #  - name: Disabe usb by mac udev rule
+# #    file:
+# #      state: link
+# #      src: /dev/null
+# #      dest: /etc/udev/rules.d/73-usb-net-by-mac.rules
+#
+#
+#   - name: Disable unwanted services
+#     service: name={{ item }} state=stopped enabled=no
+#     with_items:
+#       #- avahi-daemon
+#       #- bluetooth
+#       #- openvpn
+#       - unattended-upgrades
+#       - rsyslog
+#       - rsync
+#       - alsa-utils
+#       #- nodm
+
+  - name: reboot
+    shell: reboot
+    async: 0
+    poll: 0
+
+    # TODO following doesn't work
+  - name: waiting for server to come back after reboot
+    local_action: wait_for host={{ ansible_ssh_host }} state=started
+
+
+# TODO
+#
+# # poladit nastaveni site - zakomentovat no-auto-down u eth0 a odkomentovat 3 radky u wlan0
+#
+# mcedit /etc/network/interfaces
+# # no-auto-down eth0
+# ...
+# allow-hotplug wlan0
+# iface wlan0 inet dhcp
+# wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+#
+# -----------------------
+#
+# mcedit /etc/wpa_supplicant/wpa_supplicant.conf
+# network={
+#     ssid="xxxxx"
+#     psk="xxxx"
+# }
+#

@@ -1,0 +1,81 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+
+  - name: Update autostart_utils.sh file
+    copy:
+      dest: /opt/webscreenbox/autostart_utils.sh
+      content: |
+        #!/bin/bash
+
+        # redirect all output to a logfile
+        exec >> /opt/webscreenbox/log/utils.log
+        exec 2>&1
+
+        # disable screen saver
+        xset -dpms
+        xset s off
+        xset s noblank
+
+        # lock physical access
+        xtrlock &
+
+        # move mouse away, not to trigger hover effects
+        xdotool mousemove 0 0
+
+        # hide cursor - buggy makes zombie process when lxdm is restarted
+        #unclutter -idle 5 &
+
+        # TODO separate self-healing script
+        x11vnc -rfbauth /etc/x11vnc/vncpwd -forever -quiet &
+
+        # take screenshot every minute
+        (
+          cd /opt/webscreenbox/screenshots
+          while : ; do
+            mv current.png previous.png
+            import -window root current.png
+            sleep 60;
+          done
+        )&
+
+        # publish screenshots on port 8080
+        (cd /opt/webscreenbox/screenshots; python -m http.server 8080)&
+
+      mode: 0755
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+
+  - name: Update autostart_content.sh file
+    copy:
+      dest: /opt/webscreenbox/autostart_content.sh
+      content: |
+        #!/bin/bash
+
+        # redirect all output to a logfile
+        exec >> /opt/webscreenbox/log/content.log
+        exec 2>&1
+
+        URL=$(head -n 1 /opt/webscreenbox/simple_url.txt)
+        # URL="about:blank"
+
+        # chromium
+        #{% if not browser == 'chromium-browser' %}# {% endif %}sed -i -E 's/"exited_cleanly": ?false/"exited_cleanly":true/' ~/{{ browser_profile_path }}/Default/Preferences
+        #{% if not browser == 'chromium-browser' %}# {% endif %}sed -i -E 's/"exit_type": ?"Crashed"/"exit_type":"Normal"/' ~/{{ browser_profile_path }}/Default/Preferences
+        #{% if not browser == 'chromium-browser' %}# {% endif %}chromium-browser --start-fullscreen --no-first-run --touch-events=enabled --fast --fast-start --disable-popup-blocking --disable-infobars --disable-session-crashed-bubble --disable-tab-switcher --disable-translate --enable-low-res-tiling "${URL}"
+        {% if not browser == 'chromium-browser' %}# {% endif %}chromium-browser --incognito --start-fullscreen  --fast --fast-start --disable-popup-blocking --disable-infobars --disable-session-crashed-bubble --disable-tab-switcher --disable-translate --enable-low-res-tiling "${URL}"
+
+        # firefox
+        {% if not browser == 'firefox' %}# {% endif %}firefox -private -url "${URL}"
+
+        # midori - not available by default in Ubuntu Bionic
+        {% if not browser == 'midori' %}# {% endif %}midori -e Fullscreen -i 100 -a "${URL}"
+
+        # script
+        {% if not browser == 'scripted' %}# {% endif %}. /opt/webscreenbox/scripted_browser.sh
+
+      mode: 0755
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"

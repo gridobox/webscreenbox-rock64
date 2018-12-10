@@ -1,0 +1,16 @@
+# TODO this is not sufficient because it doesn't kill utils properly (python http.server, xtrlock, ...)
+# Please use reboot instead
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+  # - name: kill old autostart_utils.sh
+  #   shell: pkill -f -9 autostart_utils.sh
+  #   ignore_errors: true
+  #
+  # - name: kill old autostart_content.sh
+  #   shell: pkill -9 -f autostart_content.sh
+  #   ignore_errors: true
+  #
+  - name: systemctl restart lxdm
+    shell: systemctl restart lxdm

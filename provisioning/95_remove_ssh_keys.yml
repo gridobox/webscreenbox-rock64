@@ -1,0 +1,13 @@
+# Doing this you will lose access to the machine
+# You will not be able to run any more Ansible scripts
+# Until admin user pub key is in .ssh/authorized_keys
+
+---
+- hosts: board
+  gather_facts: false
+  vars:
+
+  tasks:
+
+  - name: Clear SSH key for {{ admin_user }}
+    shell: rm -rf /home/{{ admin_user }}/.ssh

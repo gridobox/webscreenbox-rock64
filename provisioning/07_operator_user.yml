@@ -1,0 +1,106 @@
+---
+- hosts: board
+  gather_facts: false
+  vars:
+    user_help_text: "Welcome to {{ webscreen_name }} admin terminal.\\n\\n{{ lookup('file', (override_includes_dir | default('includes')) + '/user_help.txt') | replace('\n', '\\n')}}\\n"
+  tasks:
+  - name: Create user {{ operator_user }}
+    user:
+      name: "{{ operator_user }}"
+      shell: /bin/bash
+      password: "{{ operator_passwd }}"
+
+  - name: Update default tmux settings
+    copy:
+      dest: /home/{{ operator_user }}/.tmux.conf
+      content: |
+        ################# GENERIC config ###################
+
+        # enable mouse scroll and select pane
+        set -g mouse on
+
+        # set long history
+        set -g history-limit 30000
+
+        # start numbering at 1
+        set -g base-index 1
+
+
+        ################  WINDOW 1  ##################
+
+        new -s "{{ operator_user }}" -n "main" "echo -e '{{ user_help_text }}' ; bash"
+      mode: 0644
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+  - name: Disable dynamic motd
+    lineinfile:
+      path: /etc/default/motd-news
+      regexp: '^ENABLED=1"'
+      line: ENABLED=0
+
+  - name: Update WebScreenBox motd
+    copy:
+      content: |
+        #!/bin/sh
+
+        TERM=linux toilet -f standard -F border -F {{ webscreen_ascii_logo_style }} " {{ webscreen_ascii_logo }} "
+
+        BLUE='\033[1;96m'
+        NC='\033[0m' # No Color
+
+        MSG="Welcome to ${BLUE}{{ webscreen_name }}${NC} admin terminal, for configuration run command:
+
+            webscreen-admin
+        "
+
+        echo "${MSG}"
+      dest: /etc/update-motd.d/45-webscreenbox
+      mode: 0755
+
+  - name: Update bash aliases
+    lineinfile:
+      path: /home/{{ operator_user }}/.bashrc
+      regexp: "^alias {{ item.alias }}="
+      line: "alias {{ item.alias }}='{{ item.command }}'"
+    with_items:
+    - alias: "webscreen-admin"
+      command: "tmux attach"
+    - alias: "enable-writable"
+      command: "sudo overlayroot-chroot"
+    - alias: "disable-writable"
+      command: "exit"
+    - alias: "edit-url"
+      command: "mcedit /opt/webscreenbox/simple_url.txt"
+    - alias: "edit-hostname"
+      command: "sudo mcedit /etc/hostname"
+    - alias: "reset-browser"
+      command: "rm -rf /home/{{ operator_user }}/{{ browser_cache_path }} /home/{{ operator_user }}/{{ browser_profile_path }}"
+    - alias: "configure-network"
+      command: "sudo nmtui"
+    - alias: "reboot"
+      command: "sudo reboot"
+
+  # - name: Allow ALL sudo for user {{ operator_user }}
+  #   lineinfile:
+  #     path: /etc/sudoers
+  #     line: '{{ operator_user }} ALL=(ALL) NOPASSWD: ALL'
+
+#  - name: Allow individual sudo for user {{ operator_user }}
+#    lineinfile:
+#      path: /etc/sudoers
+#      line: '{{ operator_user }} ALL=(ALL) NOPASSWD: {{ item }}'
+#    with_items:
+#      - /usr/sbin/overlayroot-chroot
+#      - /usr/bin/mcedit /etc/hostname
+#      - /usr/bin/nmtui
+#      - /sbin/reboot
+
+  - name: Suppress sudo messages
+    copy:
+      content: ""
+      dest: /home/{{ operator_user }}/.sudo_as_admin_successful
+      force: no
+      mode: 644
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"

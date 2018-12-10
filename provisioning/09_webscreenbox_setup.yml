@@ -1,0 +1,48 @@
+---
+- hosts: board
+  gather_facts: false
+  vars:
+
+  tasks:
+
+  # TODO background picture
+  # TODO hide taskbar
+
+  - name: LXDE autologin for user {{ operator_user }}
+    lineinfile:
+      path: /etc/lxdm/lxdm.conf
+      regexp: '^#? ?autologin='
+      line: 'autologin={{ operator_user }}'
+
+  - name: Check .config directory exists
+    file:
+      dest: /home/{{operator_user}}/.config
+      state: directory
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+  - name: Check autostart directory exists
+    file:
+      dest: /home/{{operator_user}}/.config/autostart
+      state: directory
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+  - name: LXDE autostart utils for user {{operator_user}}
+    copy:
+      dest: /home/{{operator_user}}/.config/autostart/webscreenbox-utils.desktop
+      content: |
+        [Desktop Entry]
+        Type=Application
+        Exec=sh -c "pkill -fx -9 autostart_utils.sh; /opt/webscreenbox/autostart_utils.sh"
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+  - name: LXDE autostart content for user {{operator_user}}
+    copy:
+      dest: /home/{{operator_user}}/.config/autostart/webscreenbox-content.desktop
+      content: |
+        [Desktop Entry]
+        Type=Application
+        Exec=sh -c "pkill -fx -9 autostart_content.sh; /opt/webscreenbox/autostart_content.sh"
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"

@@ -1,0 +1,8 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+  - name: Update System
+    # force apt get because of error
+    # Unable to find APTITUDE in path. Please make sure to have APTITUDE in path or use 'force_apt_get=True'
+    apt: name=* state=latest update_cache=yes force_apt_get=True

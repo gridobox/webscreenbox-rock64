@@ -1,0 +1,27 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+
+  - name: Install software
+    apt: name=zabbix-agent state=present
+
+  - name: Zabbix config
+    copy:
+      dest: /etc/zabbix/zabbix_agentd.conf
+      content: |
+        PidFile=/var/run/zabbix/zabbix_agentd.pid
+        LogFile=/var/log/zabbix-agent/zabbix_agentd.log
+        LogFileSize=0
+        Include=/etc/zabbix/zabbix_agentd.conf.d/*.conf
+
+        Server={{ zabbix_server }}
+        ServerActive={{ zabbix_server }}
+        HostMetadataItem=system.uname
+    register: zabbix_result
+
+  - name: restart service zabbix-agend if config has changed
+    systemd:
+      name: zabbix-agent
+      state: restarted
+    when: zabbix_result.changed

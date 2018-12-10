@@ -1,0 +1,8 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+  - name: reboot
+    shell: reboot
+    async: 0
+    poll: 0
