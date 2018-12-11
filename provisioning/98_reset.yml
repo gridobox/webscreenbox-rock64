@@ -12,5 +12,7 @@
   #   shell: pkill -9 -f autostart_content.sh
   #   ignore_errors: true
   #
-  - name: systemctl restart lxdm
-    shell: systemctl restart lxdm
+  - name: restart lxdm
+    systemd:
+      state: restarted
+      name: lxdm

@@ -6,6 +6,12 @@
     hostname:
       name: '{{ hostname }}'
 
+  - name: change /etc/hosts to reflect hostname
+    lineinfile:
+      path: /etc/hosts
+      regexp: '^127\.0\.1\.1 '
+      line: '127.0.1.1 {{ hostname }}'
+
 # TODO review
 #   - name: Disable unattended updates in apt config
 #     lineinfile:
@@ -36,14 +42,14 @@
 #       - alsa-utils
 #       #- nodm
 
-  - name: reboot
-    shell: reboot
-    async: 0
-    poll: 0
-
-    # TODO following doesn't work
-  - name: waiting for server to come back after reboot
-    local_action: wait_for host={{ ansible_ssh_host }} state=started
+  # - name: reboot
+  #   shell: reboot
+  #   async: 0
+  #   poll: 0
+  #
+  #   # TODO following doesn't work
+  # - name: waiting for server to come back after reboot
+  #   local_action: wait_for host={{ ansible_ssh_host }} state=started
 
 
 # TODO

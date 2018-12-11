@@ -1,0 +1,18 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+
+  - name: disable incoming LANG env
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^(# ?|)AcceptEnv LANG LC_\*'
+      line: '#AcceptEnv LANG LC_*'
+      backrefs:
+    register: disable_lang
+
+  - name: restart sshd
+    systemd:
+      state: restarted
+      name: sshd
+    when: disable_lang.changed

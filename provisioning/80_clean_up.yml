@@ -11,6 +11,15 @@
     - /var/log/syslog
     - /var/log/kern.log
     - /var/log/auth.log
+    - /var/log/Xorg.0.log
+    - /var/log/lxdm.log
+    - /var/log/syslog
+    - /var/log/zabbix-agent/zabbix_agentd.log
+    - /opt/webscreenbox/content.log
+    - /opt/webscreenbox/utils.log
+
+  - name: Clear rotated log files
+    shell: rm -rf /var/log/*.log.*
 
   - name: Clear Chromium browser cache and profile
     shell: rm -rf /home/{{ operator_user }}/{{ browser_cache_path }} /home/{{ operator_user }}/{{ browser_profile_path }}

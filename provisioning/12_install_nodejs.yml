@@ -1,0 +1,14 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+
+  - name: install nodejs
+    apt:
+      name: nodejs
+      state: latest
+
+  - name: install npm
+    apt:
+      name: npm
+      state: latest

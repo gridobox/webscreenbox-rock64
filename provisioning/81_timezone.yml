@@ -1,0 +1,7 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+  - name: set timezone to {{ timezone }}
+    timezone:
+      name: "{{ timezone }}"

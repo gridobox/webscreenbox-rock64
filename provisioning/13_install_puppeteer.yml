@@ -1,0 +1,28 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+
+  - name: directory /opt/webscreenbox/puppeteer
+    file:
+      path: /opt/webscreenbox/puppeteer
+      state: directory
+      mode: 0755
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+
+  - name: install puppeteer
+    npm:
+      name: puppeteer
+      path: /opt/webscreenbox/puppeteer
+    become: true
+    become_method: "{{ 'su' if ansible_user == 'root' else 'sudo' }}"
+    become_user: "{{ operator_user }}"
+
+  - name: install screenres
+    npm:
+      name: screenres
+      path: /opt/webscreenbox/puppeteer
+    become: true
+    become_method: "{{ 'su' if ansible_user == 'root' else 'sudo' }}"
+    become_user: "{{ operator_user }}"

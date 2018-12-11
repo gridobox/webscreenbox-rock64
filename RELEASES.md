@@ -1,8 +1,9 @@
 # Releases
 
-0.1 - in progress
+1.0 - in progress
 Features
 - SSH access
 - VNC access
-- physical access (keyboard/mouse) prevention
--
+- physical access prevention (keyboard/mouse)
+- browser automation for logins etc. - Puppeteer
+- split screen with scripted browser

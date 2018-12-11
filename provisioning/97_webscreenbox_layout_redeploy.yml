@@ -1,0 +1,17 @@
+---
+- hosts: board
+  gather_facts: false
+  tasks:
+
+  - name: deploy local layout config
+    template:
+      src: ../layouts/{{ layout }}
+      dest: "/opt/webscreenbox/scripted.sh"
+      owner: "{{ operator_user }}"
+      group: "{{ operator_user }}"
+      mode: 0755
+
+  - name: restart lxdm
+    systemd:
+      state: restarted
+      name: lxdm
