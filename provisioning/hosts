@@ -10,10 +10,8 @@ simple_url="http://github.com"
 hostname="webscreenbox001"
 
 admin_user=rock64
-admin_user_home=/home/rock64
 
-# browser="firefox"
-browser="chromium-browser"
+admin_user_home=/home/rock64
 
 # relative to operator user home dir, no trailing slash
 browser_cache_path=".cache/chromium"
@@ -33,13 +31,20 @@ webscreen_name="Web Screen Box"
 webscreen_ascii_logo="WebScreenBox"
 webscreen_ascii_logo_style="metal"
 
+# browser="chromium-browser"
+# browser="firefox"
+# browser="scripted"
+# for scripted
+start_browser_script="chromium_app.sh"
+timezone="Europe/London"
 
 [localhost]
 127.0.0.1
 
 #### SET YOUR HOST HERE ####
 [board:children]
-192.168.1.10
+192.168.1.10     browser=chromium-browser
+#192.168.1.10    browser=scripted       layout=example_automation.sh
 
 [board:vars]
 ansible_user="{{ admin_user }}"
