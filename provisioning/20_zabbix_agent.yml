@@ -1,12 +1,19 @@
 ---
 - hosts: board
   gather_facts: false
+  handlers:
+    - name: restart zabbix-agent
+      systemd:
+        state: restarted
+        name: zabbix-agent
+
   tasks:
 
   - name: Install software
     apt: name=zabbix-agent state=present
 
   - name: Zabbix config
+    notify: restart zabbix-agent
     copy:
       dest: /etc/zabbix/zabbix_agentd.conf
       content: |
@@ -18,10 +25,9 @@
         Server={{ zabbix_server }}
         ServerActive={{ zabbix_server }}
         HostMetadataItem=system.uname
-    register: zabbix_result
 
-  - name: restart service zabbix-agend if config has changed
+  - name: ensure zabbix-agent is running and auto-start enabled
     systemd:
       name: zabbix-agent
-      state: restarted
-    when: zabbix_result.changed
+      state: started
+      enabled: true
