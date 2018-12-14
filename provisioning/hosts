@@ -19,6 +19,7 @@ browser_cache_path=".cache/chromium"
 browser_profile_path=".config/chromium"
 
 zabbix_server=192.168.1.1
+snmp_ro_community=public
 
 x11vnc_passwd=mypassword
 
