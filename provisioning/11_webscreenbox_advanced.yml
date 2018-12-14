@@ -30,12 +30,12 @@
         # TODO separate self-healing script
         x11vnc -rfbauth /etc/x11vnc/vncpwd -forever -quiet &
 
-        # take screenshot every minute
+        # take screenshot every minute - jpg for better compression
         (
           cd /opt/webscreenbox/screenshots
           while : ; do
-            mv current.png previous.png
-            import -window root current.png
+            mv current.jpg previous.jpg
+            import -window root -resize 480x270 -quality 70 -colors 64 current.jpg
             sleep 60;
           done
         )&
