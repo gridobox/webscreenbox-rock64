@@ -74,6 +74,12 @@ ansible-playbook -i hosts 80_clean_up.yml
 
 ```
 
+Manual steps - LXDE:
+
+- hide taskbar
+- set background picture
+
+
 # TODO
 
 ```
