@@ -34,14 +34,14 @@
         (
           cd /opt/webscreenbox/screenshots
           while : ; do
-            mv current.jpg previous.jpg
+            cp -a current.jpg previous.jpg
             import -window root -resize 480x270 -quality 70 -colors 64 current.jpg
             sleep 60;
           done
         )&
 
         # publish screenshots on port 8080
-        (cd /opt/webscreenbox/screenshots; python -m http.server 8080)&
+        (cd /opt/webscreenbox/screenshots; python3 -m http.server 8080)&
 
       mode: 0755
       owner: "{{ operator_user }}"
