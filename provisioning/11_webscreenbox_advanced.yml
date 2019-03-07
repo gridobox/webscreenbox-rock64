@@ -35,7 +35,7 @@
           cd /opt/webscreenbox/screenshots
           while : ; do
             cp -a current.jpg previous.jpg
-            import -window root -resize 480x270 -quality 70 -colors 64 current.jpg
+            import -silent -window root -resize 480x270 -quality 70 -colors 64 current.jpg
             sleep 60;
           done
         )&
