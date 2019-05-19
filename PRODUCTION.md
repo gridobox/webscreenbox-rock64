@@ -15,9 +15,9 @@ dd if=<your_image>.img of=/dev/mmcblk0 bs=1M
 # change hostname
 mcedit /media/<username>/<device_uuid>/etc/hostname
 
-# set timezone
-unlink /media//<username>/<device_uuid>/etc/localtime
-ln -s /usr/share/zoneinfo/Europe/London /media//<username>/<device_uuid>/etc/localtime
+# set timezone - change Europe/London as needed
+unlink /media/<username>/<device_uuid>/etc/localtime
+ln -s /usr/share/zoneinfo/Europe/London /media/<username>/<device_uuid>/etc/localtime
 
 # eject card - unmount
 
