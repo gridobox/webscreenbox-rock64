@@ -44,3 +44,18 @@ ansible-playbook -i hosts 90_install_url_configs.yml
 ansible-playbook -i hosts 98_reset_browser.yml
 ansible-playbook -i hosts 99_reboot.yml
 '''
+
+
+# Ideas
+
+
+prevent dmesg swamped by systemd errors - disable cow
+
+Errors are like `[ 4925.384121] systemd-journald[367]: Failed to open system journal: Operation not supported`
+
+```
+ln -s /dev/null /etc/tmpfiles.d/journal-nocow.conf
+```
+
+# disable predictable network names (to allow different wifi dongles always under wlan0)
+sudo ln -s /dev/null /media/myuser/linux-root/etc/udev/rules.d/80-net-setup-link.rules
